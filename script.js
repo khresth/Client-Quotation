@@ -1,102 +1,84 @@
-function calculateQuotation() {
-    let baseCosts = {
-        frontend: 125,
-        backend: 350,
-        api: 100,
-        ai: 2500,
-        ml: 150,
-        bot: 100,
-        design: 30,
-        documentary: 50,
-        maintenanceMonthly: 25,
-        maintenanceYearly: 200,
-        hosting: 100
-    };
-
-    let totalCost = 0;
-    document.querySelectorAll('input[name="projectType"]:checked').forEach((checkbox) => {
-        totalCost += baseCosts[checkbox.value];
-    });
-
-    if (document.querySelector('input[name="clientType"]:checked').value === 'company') {
-        totalCost *= 1.20;
-    }
-
-    if (document.querySelector('input[name="deadline"]:checked').value === 'tight') {
-        totalCost *= 1.15;
-    }
-
-    if (document.getElementById('nda').checked) {
-        totalCost *= 1.05;
-    }
-    if (document.getElementById('lteDiscount').checked) {
-        totalCost *= 0.85;
-    }
-
-    document.getElementById('finalCost').innerText = totalCost.toFixed(2);
-}
-function printInvoice() {
-    const baseCosts = {
-        frontend: 125,
-        backend: 350,
-        api: 100,
-        ai: 2500,
-        ml: 150,
-        bot: 100,
-        design: 30,
-        documentary: 50,
-        maintenanceMonthly: 25,
-        maintenanceYearly: 200,
-        hosting: 100
-    };
-
-    const checkedTypes = document.querySelectorAll('input[name="projectType"]:checked');
-    const clientType = document.querySelector('input[name="clientType"]:checked').value;
-    const isCompany = clientType === "company";
-    const ndaSelected = document.getElementById('nda').checked;
-    const deadline = document.querySelector('input[name="deadline"]:checked').value;
-    const lteDiscount = document.getElementById('lteDiscount').checked;
-
-    let invoiceContent = "Service        Deadline       LTE Discount    Consultancy     NDA\n";
-    invoiceContent += "---------------------------------------------------------------------\n";
-    
-    let totalCost = 0;
-
-    checkedTypes.forEach((checkbox) => {
-        const projectType = checkbox.value;
-        let baseCost = baseCosts[projectType];
-        totalCost += baseCost;
-
-        const consultancyCost = isCompany ? (baseCost * 0.30).toFixed(2) : "n/a";
-        const deadlineCost = deadline === 'tight' ? (baseCost * 0.15).toFixed(2) : 'n/a';
-        const lteDiscountAmount = lteDiscount ? (baseCost * 0.15).toFixed(2) : 'n/a';
-        const ndaCost = ndaSelected ? (baseCost * 0.05).toFixed(2) : 'n/a';
-
-        invoiceContent += `${projectType.padEnd(16)} ${deadlineCost.padEnd(14)} ${lteDiscountAmount.padEnd(14)} ${consultancyCost.padEnd(16)} ${ndaCost.padEnd(10)}\n`;
-    });
-
-    if (isCompany) totalCost *= 1.30;
-    if (deadline === 'tight') totalCost *= 1.15;
+function calculateCost(checkedTypes, clientType, deadline, ndaSelected, lteDiscount) {
+    const baseCosts = { frontend: 125, backend: 350, ai: 2500, design: 30 };
+    let totalCost = checkedTypes.reduce((sum, type) => sum + (baseCosts[type] || 0), 0);
+    if (clientType === "company") totalCost *= 1.20;
+    if (deadline === "tight") totalCost *= 1.15;
     if (ndaSelected) totalCost *= 1.05;
     if (lteDiscount) totalCost *= 0.85;
-
-    const upfrontPayment = (totalCost * 0.40).toFixed(2);
-    const firstMilestone = (totalCost * 0.10).toFixed(2);
-    const secondMilestone = (totalCost * 0.25).toFixed(2);
-    const finalPayment = (totalCost * 0.25).toFixed(2);
-
-    invoiceContent += `\nTotal Cost: $${totalCost.toFixed(2)}\n`;
-    invoiceContent += `\nPayment Terms:\n`;
-    invoiceContent += `40% upfront payment upon signing the contract: $${upfrontPayment}\n`;
-    invoiceContent += `10% upon completion of the first milestone: $${firstMilestone}\n`;
-    invoiceContent += `25% upon completion of the second milestone: $${secondMilestone}\n`;
-    invoiceContent += `25% upon final delivery and client approval: $${finalPayment}\n`;
-
-    const blob = new Blob([invoiceContent], { type: 'text/plain' });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "invoice.txt";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    return totalCost;
 }
+
+
+function updateCostDisplay() {
+    const checkedTypes = Array.from(document.querySelectorAll('input[name="projectType"]:checked')).map(cb => cb.value);
+    const clientType = document.querySelector('input[name="clientType"]:checked').value;
+    const deadline = document.querySelector('input[name="deadline"]:checked').value;
+    const ndaSelected = document.getElementById('nda').checked;
+    const lteDiscount = document.getElementById('lteDiscount').checked;
+
+    const totalCost = calculateCost(checkedTypes, clientType, deadline, ndaSelected, lteDiscount);
+    document.getElementById('finalCost').innerText = totalCost.toFixed(2);
+}
+
+
+async function generateEssay(prompt) {
+    try {
+        const response = await fetch("https://api-inference.huggingface.co/models/distilgpt2", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ inputs: prompt, parameters: { max_length: 300, temperature: 0.7 } })
+        });
+        const data = await response.json();
+        return data[0]?.generated_text || "Error generating essay.";
+    } catch (error) {
+        console.error("API Error:", error);
+        return "Error generating essay.";
+    }
+}
+
+
+async function generateEssayReport() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+
+    const clientName = document.getElementById('clientName').value || "Client";
+    const checkedTypes = Array.from(document.querySelectorAll('input[name="projectType"]:checked')).map(cb => cb.value);
+    const clientType = document.querySelector('input[name="clientType"]:checked').value;
+    const deadline = document.querySelector('input[name="deadline"]:checked').value;
+    const ndaSelected = document.getElementById('nda').checked;
+    const lteDiscount = document.getElementById('lteDiscount').checked;
+    const totalCost = calculateCost(checkedTypes, clientType, deadline, ndaSelected, lteDiscount);
+
+
+    const prompt = `Write a concise, professional proposal starting with "Dear ${clientName},". The project includes ${checkedTypes.join(", ") || "no services selected"}. It’s for a ${clientType} with a ${deadline} deadline. Include ${ndaSelected ? "an NDA" : "no NDA"} and ${lteDiscount ? "an LTE discount" : "no discount"}. Total cost is $${totalCost.toFixed(2)}. End with a friendly closing and contact info (xxx@gmail.com, 123 456 7890).`;
+
+
+    let essayText = await generateEssay(prompt);
+
+
+    if (!essayText.includes("Dear") || essayText.includes("Error")) {
+        essayText = `Dear ${clientName},\n\nWe’re excited to present your project quotation. Your project includes ${checkedTypes.join(", ") || "no services selected"}, tailored for a ${clientType} with a ${deadline} timeline. ${ndaSelected ? "An NDA ensures confidentiality" : "No NDA is included"}, and ${lteDiscount ? "you’re receiving our LTE discount" : "no discount applies"}. The total cost is $${totalCost.toFixed(2)}. We’re eager to get started reach out at xxx@gmail.com or 123 456 7890 with any questions!\n\nBest regards,\nMagnimont`;
+    }
+
+    let yPos = 20;
+    doc.setFontSize(14);
+    doc.text("Magnimont", 10, yPos);
+    yPos += 10;
+    doc.setFontSize(10);
+    doc.text("March 30, 2025", 10, yPos);
+    yPos += 10;
+
+    doc.setFontSize(11);
+    doc.text(essayText, 10, yPos, { maxWidth: 180 });
+
+
+    doc.save(`Quotation_Proposal_${clientName}.pdf`);
+}
+
+
+document.getElementById('generateButton').addEventListener('click', generateEssayReport);
+document.querySelectorAll('input').forEach(input => input.addEventListener('change', updateCostDisplay));
+
+
+updateCostDisplay();
