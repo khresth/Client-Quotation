@@ -24,34 +24,39 @@
                 <label><input type="checkbox" name="projectType" value="maintenanceYearly"> Maintenance (Yearly) - $200</label><br><br>
                 <label><input type="checkbox" name="projectType" value="hosting"> Hosting - $100</label><br>
             </fieldset>
-            
+
             <fieldset>
                 <legend><h2>ADDITIONAL</h2></legend>
                 <label><input type="checkbox" id="nda" name="nda"> NDA (+5%)</label><br><br>
                 <label><input type="checkbox" id="lteDiscount" name="lteDiscount"> LTE Discount (-15%)</label><br>
             </fieldset>
-            
+
             <fieldset>
                 <legend><h2>CLIENT TYPE</h2></legend>
                 <label><input type="radio" name="clientType" value="individual" checked> Individual</label><br><br>
                 <label><input type="radio" name="clientType" value="company"> Company (+20%)</label><br>
             </fieldset>
-            
+
             <fieldset>
                 <legend><h2>DEADLINE</h2></legend>
                 <label><input type="radio" name="deadline" value="normal" checked> Normal</label><br><br>
-                <label><input type="radio" name="deadline" value="tight"> Tight (+15%)</label>
+                <label><input type="radio" name="deadline" value="tight"> Tight (+15%)</label><br>
             </fieldset>
 
-            <button type="button" onclick="calculateQuotation()">Get Quotation</button> <br>
-            <button type="button" onclick="printInvoice()">Print Invoice</button>
+            <fieldset>
+                <legend><h2>CLIENT NAME</h2></legend>
+                <input type="text" id="clientName" placeholder="Enter client name" required>
+            </fieldset>
 
+            <button type="button" id="generateButton">Generate Proposal</button>
         </form>
 
         <div id="result">
             <h2>Final Cost: $<span id="finalCost">0.00</span></h2>
         </div>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
