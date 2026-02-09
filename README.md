@@ -1,2 +1,3 @@
 # Client-Quotation
-Automated client quotation generator @Magnimont 2025
+Automated client quotation generator @Magnimont 2026
+https://client-quotation.vercel.app
