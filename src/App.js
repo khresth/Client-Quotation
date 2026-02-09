@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import jsPDF from 'jspdf';
 import './App.css';
 
 const baseCosts = {
@@ -86,6 +85,8 @@ function App() {
   const generateProposal = async () => {
     setIsGenerating(true);
     
+    // Dynamically import jsPDF only on client side
+    const { jsPDF } = await import('jspdf');
     const doc = new jsPDF();
     
     const selectedLabels = selectedProjects.map(id => 
