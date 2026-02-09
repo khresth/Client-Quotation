@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 
 const baseCosts = {
@@ -41,7 +41,7 @@ function App() {
   const [totalCost, setTotalCost] = useState(0);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const calculateCost = () => {
+  const calculateCost = useCallback(() => {
     let cost = selectedProjects.reduce((sum, projectId) => sum + (baseCosts[projectId] || 0), 0);
     
     if (clientType === 'company') cost *= 1.20;
@@ -50,11 +50,11 @@ function App() {
     if (lteDiscount) cost *= 0.85;
     
     return cost;
-  };
+  }, [selectedProjects, clientType, deadline, ndaSelected, lteDiscount]);
 
   useEffect(() => {
     setTotalCost(calculateCost());
-  }, [selectedProjects, clientType, deadline, ndaSelected, lteDiscount]);
+  }, [calculateCost]);
 
   const handleProjectToggle = (projectId) => {
     setSelectedProjects(prev => 
