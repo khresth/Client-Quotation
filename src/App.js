@@ -121,7 +121,8 @@ function App() {
       <div className="container fade-in">
         <header className="header">
           <h1 className="logo">Magnimont</h1>
-          <p className="subtitle">Professional Quotation System</p>
+          <p className="subtitle">Software for Ventures</p>
+          <p className="tagline">Transforming Ideas Into Digital Reality</p>
         </header>
         
         <div className="form-grid">
@@ -138,28 +139,6 @@ function App() {
                   {project.label} <span className="price-tag">${project.price}</span>
                 </label>
               ))}
-            </div>
-          </fieldset>
-          
-          <fieldset className="fieldset">
-            <legend className="legend">Additional Options</legend>
-            <div className="checkbox-group">
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={ndaSelected}
-                  onChange={(e) => setNdaSelected(e.target.checked)}
-                />
-                NDA <span className="price-tag">(+5%)</span>
-              </label>
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={lteDiscount}
-                  onChange={(e) => setLteDiscount(e.target.checked)}
-                />
-                LTE Discount <span className="price-tag">(-15%)</span>
-              </label>
             </div>
           </fieldset>
           
@@ -211,6 +190,28 @@ function App() {
                   onChange={(e) => setDeadline(e.target.value)}
                 />
                 Tight <span className="price-tag">(+15%)</span>
+              </label>
+            </div>
+          </fieldset>
+          
+          <fieldset className="fieldset">
+            <legend className="legend">Additional Options</legend>
+            <div className="checkbox-group">
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={ndaSelected}
+                  onChange={(e) => setNdaSelected(e.target.checked)}
+                />
+                NDA <span className="price-tag">(+5%)</span>
+              </label>
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={lteDiscount}
+                  onChange={(e) => setLteDiscount(e.target.checked)}
+                />
+                LTE Discount <span className="price-tag">(-15%)</span>
               </label>
             </div>
           </fieldset>
