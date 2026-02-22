@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 
+// Updated pricing system with new tiers - v2.0
+
 const baseCosts = {
   webDevelopmentStarter: 499,
   webDevelopmentProfessional: 1499,
